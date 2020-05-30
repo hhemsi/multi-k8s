@@ -1,0 +1,68 @@
+K8S version:
+
+nginx is deleted as we rely on ingress service
+
+the client-deployment.yaml has 
+  spec:
+  replicas: 3
+which indicates to have 3 instances running inside the Pod
+
+# delete old deployments 
+kubectl delete deployment client-deployment
+kubectl delete service client-node-port
+
+Note: we can combine configurations into one configuration 
+for example client-deployment.yaml & client-cluster-ip-service.yaml
+add --- at the end of each configuration
+
+
+ClusterIP service allows net connections only inside the node
+it does not allow connection from outside. If no clusterIP sercice
+is added, then the container is not accessible even within the node from
+other containers.
+
+for postgres we needed PVC (persistnet volume claim)
+  volume in kubernetes: is an object allows a container to store data at a 
+  Pod level. Containers running inside the Pos have access to the volume.
+  Note if a Pod dies then the volume is lost (data are lost)
+
+  persistnet volume: exists even if Pod dies or recreated ... etc
+  persistnet volume claim: an advertisement not an actual volume 
+     statically provisioned volume: created in advance
+     dynamic provisioned volume: created when needed (asked for it)
+  see the definition of the persistent volume claim definition in database-perisistent-volume.yaml
+    ReadWriteOnce: Single node can read /write
+    ReadWriteMany: multiple nodes can read/write
+    ReadOnlyMany: multiple nodes can read only 
+
+DB password is provided by k8s Secret service this is done using the command
+type of secret is generic or (docker register/ tls )
+secret_name is used for later reference in pod config
+kubectl create secret generic <secret name> --from-literal  key=value
+Example:
+kubectl create secret generic pgpassword --from-literal PGPASSWORD=12345asdf
+kubectl get secrets
+
+Ingress:
+  We are using: ingress-nginx led by community
+  there is also:  kubernetes-ingress : project led by company nginx.
+  these are two separate projects.
+  setup of ingress-nginx is different between diff env (local/Google cloud/ AWS / Azure)
+  when creating ingress on Google cloud: we get also Google Cloud Load Balancer
+  Reading:
+  https://www.joyfulbikeshedding.com/blog/2018-03-26-studying-the-kubernetes-ingress-system.html
+
+  ingress-nginx github: https://github.com/kubernetes/ingress-nginx
+  Installation
+  https://kubernetes.github.io/ingress-nginx/deploy/#minikube
+
+  to install I used
+  minikube addons enable ingress
+
+  kubernetes get ingress 
+
+# to test locally
+http://172.17.0.2/
+
+# apply all configuration
+kubectl app -f K8S
