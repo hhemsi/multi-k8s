@@ -1,4 +1,10 @@
 K8S version:
+In this version we run the application insdide minikube
+The cloud version used google cloud which I did not follow.
+I should investigate deployment over Azure or AWS instead
+There are two directories one for local k8s_local and the other for google cloud.
+This project is on github
+
 
 nginx is deleted as we rely on ingress service
 
